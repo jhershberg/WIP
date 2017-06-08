@@ -1,9 +1,12 @@
 set -x
-last_quad=$1
-subnet_id=$(neutron subnet-list | awk '/S1/ {print $2}')
+ip=$3
+subnet=$2
+network=$1
+
+subnet_id=$(neutron subnet-list | grep $subnet | awk '{print $2}')
 mac=$(uuidgen | md5sum | sed -e 's/\(..\)\(..\)\(..\)\(..\).*/52:54:\1:\2:\3:\4/')
 
-neutron port-create --name josh${last_quad} --fixed-ip subnet_id=$(subnet_id),ip_address=192.168.2.10${last_quad} N1 --mac-address $mac --device-owner compute:nova --device-id $(uuidgen)
+neutron port-create --name port-${ip} --fixed-ip subnet_id=$(subnet_id),ip_address=${ip} $network --mac-address $mac --device-owner compute:nova --device-id $(uuidgen)
 
 port_uuid=$(neutron port-list | grep $mac | awk '{print $2}')
 tap_name=$(echo $port_uuid | sed -e 's/\(...........\).*/tap\1/')
