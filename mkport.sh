@@ -12,4 +12,4 @@ port_uuid=$(neutron port-list | grep $mac | awk '{print $2}')
 tap_name=$(echo $port_uuid | sed -e 's/\(...........\).*/tap\1/')
 
 sudo ovs-vsctl add-port br-int $tap_name -- set interface $tap_name type=internal -- set interface $tap_name external_ids=attached_mac=\"$mac\",iface-id=$port_uuid,iface-status=active
-exir $?
+exit $?

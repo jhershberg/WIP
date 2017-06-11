@@ -1,7 +1,7 @@
 action=c
-num_nets=5
-num_subnets=5
-num_ports=20
+num_nets=2
+num_subnets=2
+num_ports=2
 
 
 for net_num in $(seq 0 $(expr $num_nets - 1))
