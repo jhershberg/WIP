@@ -1,8 +1,16 @@
 action=c
-num_nets=2
-num_subnets=2
-num_ports=2
+num_nets=10
+num_subnets=5
+num_ports=10
 
+ovs_node_0=192.168.0.5
+ovs_node_1=192.168.0.9
+num_nodes=2
+
+port_counter=0
+
+# may need to adjust this
+neutron quota-update --port 550
 
 for net_num in $(seq 0 $(expr $num_nets - 1))
 do
@@ -29,14 +37,17 @@ do
 		do
 			ip=10.${net_num}.${sub_num}.$(expr 100 + $port_num)
 
+			port_counter=$(expr $port_counter + 1)
+			node=ovs_node_$(python -c "print $port_counter % $num_nodes")
+
 			if [ $action = c ]
 			then
-				./mkport.sh $net_name $sub_name $ip || exit 1
+				./mkport.sh $net_name $sub_name $ip ${!node} || exit 1
 			fi
 
 			if [ $action = d ]
 			then
-				./delport.sh $ip
+				./delport.sh $ip ${!node}
 			fi
 		done
 		if [ $action = d ]
