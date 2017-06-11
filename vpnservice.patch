@@ -1,0 +1,49 @@
+diff -u o/bin/start n/bin/start
+--- o/bin/start	2016-02-08 15:14:20.570816925 +0200
++++ n/bin/start	2016-02-08 15:15:07.327814649 +0200
+@@ -148,7 +148,7 @@
+     if [ ! -d "$KARAF_DATA/log" ]; then
+         mkdir -p "$KARAF_DATA/log"
+     fi
+-    exec "$KARAF_HOME"/bin/karaf server "$@" >> "$KARAF_REDIRECT" 2>&1 &
++    exec "$KARAF_HOME"/bin/karaf debug server "$@" >> "$KARAF_REDIRECT" 2>&1 &
+ }
+ 
+ main() {
+diff -u o/etc/custom.properties n/etc/custom.properties
+--- o/etc/custom.properties	2016-02-08 15:14:42.105815877 +0200
++++ n/etc/custom.properties	2016-02-08 15:14:56.211815190 +0200
+@@ -83,7 +83,7 @@
+ 
+ # ovsdb can be configured with ml2 to perform l3 forwarding. The config below enables that functionality, which is
+ # disabled by default.
+-# ovsdb.l3.fwd.enabled=yes
++ovsdb.l3.fwd.enabled=yes
+ 
+ # ovsdb can be configured with ml2 to perform arp responder, enabled by default.
+ ovsdb.l3.arp.responder.disabled=no
+diff -u o/etc/org.ops4j.pax.logging.cfg n/etc/org.ops4j.pax.logging.cfg
+--- o/etc/org.ops4j.pax.logging.cfg	2016-02-08 15:14:42.104815877 +0200
++++ n/etc/org.ops4j.pax.logging.cfg	2016-02-08 15:15:01.088814953 +0200
+@@ -36,7 +36,7 @@
+ log4j.appender.out.layout.ConversionPattern=%d{ISO8601} | %-5.5p | %-16.16t | %-32.32c{1} | %X{bundle.id} - %X{bundle.name} - %X{bundle.version} | %m%n
+ log4j.appender.out.file=${karaf.data}/log/karaf.log
+ log4j.appender.out.append=true
+-log4j.appender.out.maxFileSize=1MB
++log4j.appender.out.maxFileSize=100MB
+ log4j.appender.out.maxBackupIndex=10
+ 
+ # Sift appender
+diff -u o/etc/org.apache.karaf.features.cfg n/etc/org.apache.karaf.features.cfg
+--- o/etc/org.apache.karaf.features.cfg 2016-02-21 10:56:38.774335311 +0200
++++ n/etc/org.apache.karaf.features.cfg  2016-02-21 10:56:47.491334886 +0200
+@@ -41,7 +41,7 @@
+ #
+ # Comma separated list of features to install at startup
+ #
+-featuresBoot=config,standard,region,package,kar,ssh,management
++featuresBoot=config,standard,region,package,kar,ssh,management,odl-netvirt-openstack, odl-dlux-core, odl-restconf-all
+ 
+ #
+ # Defines if the boot features are started in asynchronous mode (in a dedicated thread)
+
