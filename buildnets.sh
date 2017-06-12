@@ -10,7 +10,7 @@ num_nodes=2
 port_counter=0
 
 # may need to adjust this
-neutron quota-update --port 550
+neutron quota-update --port 600
 
 for net_num in $(seq 0 $(expr $num_nets - 1))
 do
