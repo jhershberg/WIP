@@ -1,0 +1,42 @@
+#set -x
+
+NS=ovsflowtrace
+IFC=oft
+
+BRIDGE=$1
+FLOW=$2
+
+if [ "" == "$FLOW" ]
+then
+	echo "Usage $0 <bridge-name> <flow>"
+	exit 2
+fi
+
+IFINDEX=$(ovs-ofctl -OOpenFlow13 show $BRIDGE | grep -o "[0-9]*($IFC)" | grep -o "[0-9]*")
+if [ "" == "$IFINDEX" ]
+then
+	sudo ovs-vsctl add-port $BRIDGE $IFC -- set Interface $IFC type=internal
+	IFINDEX=$(ovs-ofctl -OOpenFlow13 show $BRIDGE | grep -o "[0-9]*($IFC)" | grep -o "[0-9]*")
+fi
+
+ip netns list | grep $NS 2>&1 > /dev/null
+if [ "0" != "$?" ]
+then
+	ip netns add $NS
+	ip link set dev $IFC netns $NS
+	ip netns exec $NS ip a add dev $IFC 10.11.12.1/24
+	ip netns exec $NS ip link set dev $IFC up
+	ip netns exec $NS ip link set dev lo up
+	ip netns exec $NS ip route add default via 10.11.12.1
+fi
+
+original_flow=$(echo $FLOW | sed -e 's/cookie=[^,]*, //' | sed -e 's/duration=[^,]*, //' | sed -e 's/n_packets=[^,]*, //' | sed -e 's/n_bytes=[^,]*, //')
+new_flow=$(echo $original_flow | sed -e "s/ actions=/ actions=output:${IFINDEX},/")
+
+echo Setting flow to $new_flow
+ovs-ofctl -OOpenFlow13 add-flow $BRIDGE "$new_flow"
+
+ip netns exec $NS tcpdump -ne -i$IFC
+
+echo Resetting flow to $original_flow
+ovs-ofctl -OOpenFlow13 add-flow $BRIDGE "$original_flow"
