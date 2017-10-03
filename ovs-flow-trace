@@ -1,17 +1,31 @@
 #set -x
 
+<<<<<<< 706f3afe7e16c2dc899170e34f8c943325efce73
 NS=ovsflowtrace
 IFC=oft
+=======
+NS=snoop-ns
+IFC=snoop-port
+>>>>>>> ovs-flow-trace
 
 BRIDGE=$1
 FLOW=$2
 
 if [ "" == "$FLOW" ]
 then
+<<<<<<< 706f3afe7e16c2dc899170e34f8c943325efce73
 	echo "Usage $0 <bridge-name> <flow>"
 	exit 2
 fi
 
+=======
+	echo "Usage $0 <bridge-name> <flow> <optional tcpdump flags>"
+	exit 2
+fi
+
+shift 2
+
+>>>>>>> ovs-flow-trace
 IFINDEX=$(ovs-ofctl -OOpenFlow13 show $BRIDGE | grep -o "[0-9]*($IFC)" | grep -o "[0-9]*")
 if [ "" == "$IFINDEX" ]
 then
@@ -36,7 +50,11 @@ new_flow=$(echo $original_flow | sed -e "s/ actions=/ actions=output:${IFINDEX},
 echo Setting flow to $new_flow
 ovs-ofctl -OOpenFlow13 add-flow $BRIDGE "$new_flow"
 
+<<<<<<< 706f3afe7e16c2dc899170e34f8c943325efce73
 ip netns exec $NS tcpdump -ne -i$IFC
+=======
+ip netns exec $NS tcpdump -i$IFC $*
+>>>>>>> ovs-flow-trace
 
 echo Resetting flow to $original_flow
 ovs-ofctl -OOpenFlow13 add-flow $BRIDGE "$original_flow"
