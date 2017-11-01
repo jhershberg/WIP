@@ -1,0 +1,5 @@
+set -x
+V=$1
+~/WIP/diffable-dump.sh b${V}.flows.dump 
+~/WIP/diffable-dump.sh a${V}.flows.dump 
+diff -u b${V}.flows.dump a${V}.flows.dump > ${V}.diff
