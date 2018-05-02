@@ -1,0 +1,4 @@
+. stackrc admin admin
+name=$1
+shift
+ssh heat-admin@$(nova list | grep $name | grep -o "192.168[^ ]*") $@

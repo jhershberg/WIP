@@ -38,7 +38,7 @@ new_flow=$(echo $original_flow | sed -e "s/ actions=/ actions=output:${IFINDEX},
 echo Setting flow to $new_flow
 ovs-ofctl -OOpenFlow13 add-flow $BRIDGE "$new_flow"
 
-ip netns exec $NS tcpdump -i$IFC $*
+ip netns exec $NS tcpdump -n -i$IFC $*
 
 echo Resetting flow to $original_flow
 ovs-ofctl -OOpenFlow13 add-flow $BRIDGE "$original_flow"
