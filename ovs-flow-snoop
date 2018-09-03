@@ -33,7 +33,14 @@ then
 fi
 
 original_flow=$(echo $FLOW | sed -e 's/cookie=[^,]*, //' | sed -e 's/duration=[^,]*, //' | sed -e 's/n_packets=[^,]*, //' | sed -e 's/n_bytes=[^,]*, //')
-new_flow=$(echo $original_flow | sed -e "s/ actions=/ actions=output:${IFINDEX},/")
+
+drop_action=$(echo $original_flow | grep -o actions=drop)
+if [ "$drop_action" != "" ]
+then
+	new_flow=$(echo $original_flow | sed -e "s/ actions=.*/ actions=output:${IFINDEX}/")
+else
+	new_flow=$(echo $original_flow | sed -e "s/ actions=/ actions=output:${IFINDEX},/")
+fi
 
 echo Setting flow to $new_flow
 ovs-ofctl -OOpenFlow13 add-flow $BRIDGE "$new_flow"
