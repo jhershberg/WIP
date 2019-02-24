@@ -11,3 +11,4 @@ do
         echo ssh\'ing to $i 
         ssh heat-admin@$(nova list 2>/dev/null | grep $i | grep -o "192.168[^ ]*") $@
 done
+#dummy for test
